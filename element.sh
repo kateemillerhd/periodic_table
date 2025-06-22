@@ -9,9 +9,9 @@ if [[ -z $1 ]]; then
 fi
 
 if [[ $1 =~ ^[0-9]+$ ]]; then
-  QUERY_CONDITION="atomic_number = $1"
+  QUERY_CONDITION="e.atomic_number = $1"
 else
-  QUERY_CONDITION="symbol = '$1' OR name = '$1'"
+  QUERY_CONDITION="e.symbol = '$1' OR e.name = '$1'"
 fi
 
 RESULT=$(psql -U "$USER" -d "$DB_NAME" -t --no-align -c "
@@ -20,7 +20,7 @@ FROM elements e
 JOIN properties p ON e.atomic_number = p.atomic_number
 JOIN types t ON p.type_id = t.type_id
 WHERE $QUERY_CONDITION;
-")
+" | xargs)
 
 if [[ -z $RESULT ]]; then
   echo "I could not find that element in the database."
